@@ -1,0 +1,12 @@
+{
+    "name": "anomaly/ups_shipping_method-extension",
+    "type": "streams-addon",
+    "autoload": {
+        "psr-4": {
+            "Anomaly\\UpsShippingMethodExtension\\": "src/"
+        }
+    },
+    "require": {
+        "gabrielbull/ups-api": "0.7.*"
+    }
+}
