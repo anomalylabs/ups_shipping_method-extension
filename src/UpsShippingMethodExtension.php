@@ -2,6 +2,7 @@
 
 use Anomaly\OrdersModule\Order\Contract\OrderInterface;
 use Anomaly\ShippingModule\Method\Extension\MethodExtension;
+use Anomaly\UpsShippingMethodExtension\Command\GetQuote;
 
 /**
  * Class UpsShippingMethodExtension
@@ -31,6 +32,6 @@ class UpsShippingMethodExtension extends MethodExtension
      */
     public function quote(OrderInterface $order)
     {
-        return 10;
+        return $this->dispatch(new GetQuote($this, $order));
     }
 }
