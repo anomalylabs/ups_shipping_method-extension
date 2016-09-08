@@ -3,7 +3,6 @@
 use Anomaly\ConfigurationModule\Configuration\Contract\ConfigurationRepositoryInterface;
 use Anomaly\OrdersModule\Order\Contract\OrderInterface;
 use Anomaly\ShippingModule\Method\Extension\MethodExtension;
-use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Ups\Entity\Address;
 use Ups\Entity\Dimensions;
@@ -25,7 +24,7 @@ use Ups\Rate;
  * @author        Ryan Thompson <ryan@pyrocms.com>
  * @package       Anomaly\UpsShippingMethodExtension\Command
  */
-class GetQuote implements SelfHandling
+class GetQuote
 {
 
     use DispatchesJobs;

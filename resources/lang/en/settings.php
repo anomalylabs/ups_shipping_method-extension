@@ -2,12 +2,12 @@
 
 return [
     'access_key' => [
-        'name' => 'Access Key'
+        'name' => 'Access Key',
     ],
     'username'   => [
-        'name' => 'Username'
+        'name' => 'Username',
     ],
     'password'   => [
-        'name' => 'Password'
+        'name' => 'Password',
     ],
 ];

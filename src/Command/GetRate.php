@@ -2,7 +2,6 @@
 
 use Anomaly\ShippingModule\Method\Contract\MethodInterface;
 use Anomaly\ShippingModule\Method\Extension\MethodExtension;
-use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Config\Repository;
 use Ups\Rate;
 
@@ -14,7 +13,7 @@ use Ups\Rate;
  * @author        Ryan Thompson <ryan@pyrocms.com>
  * @package       Anomaly\UpsShippingMethodExtension\Command
  */
-class GetRate implements SelfHandling
+class GetRate
 {
 
     /**

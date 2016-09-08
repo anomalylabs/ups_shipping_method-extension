@@ -2,6 +2,6 @@
 
 return [
     'service' => [
-        'name' => 'Service'
+        'name' => 'Service',
     ],
 ];
