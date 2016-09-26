@@ -2,6 +2,7 @@
 
 use Anomaly\OrdersModule\Order\Contract\OrderInterface;
 use Anomaly\ShippingModule\Method\Extension\MethodExtension;
+use Anomaly\ShippingModule\Shippable\Contract\ShippableInterface;
 use Anomaly\UpsShippingMethodExtension\Command\GetQuote;
 
 /**
@@ -24,14 +25,14 @@ class UpsShippingMethodExtension extends MethodExtension
     protected $provides = 'anomaly.module.shipping::method.ups';
 
     /**
-     * Return a quote for an order.
+     * Get a shipping quote.
      *
-     * @param OrderInterface $order
+     * @param ShippableInterface $shippable
+     * @param array              $parameters
      * @throws \Exception
-     * @return float
      */
-    public function quote(OrderInterface $order)
+    public function quote(ShippableInterface $shippable, array $parameters = [])
     {
-        return $this->dispatch(new GetQuote($this, $order));
+        return $this->dispatch(new GetQuote($this, $shippable, $parameters));
     }
 }

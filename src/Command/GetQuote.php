@@ -1,8 +1,8 @@
 <?php namespace Anomaly\UpsShippingMethodExtension\Command;
 
 use Anomaly\ConfigurationModule\Configuration\Contract\ConfigurationRepositoryInterface;
-use Anomaly\OrdersModule\Order\Contract\OrderInterface;
 use Anomaly\ShippingModule\Method\Extension\MethodExtension;
+use Anomaly\ShippingModule\Shippable\Contract\ShippableInterface;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Ups\Entity\Address;
 use Ups\Entity\Dimensions;
@@ -19,10 +19,9 @@ use Ups\Rate;
 /**
  * Class GetQuote
  *
- * @link          http://pyrocms.com/
- * @author        PyroCMS, Inc. <support@pyrocms.com>
- * @author        Ryan Thompson <ryan@pyrocms.com>
- * @package       Anomaly\UpsShippingMethodExtension\Command
+ * @link   http://pyrocms.com/
+ * @author PyroCMS, Inc. <support@pyrocms.com>
+ * @author Ryan Thompson <ryan@pyrocms.com>
  */
 class GetQuote
 {
@@ -30,11 +29,11 @@ class GetQuote
     use DispatchesJobs;
 
     /**
-     * The order interface.
+     * The shippable interface.
      *
-     * @var OrderInterface
+     * @var ShippableInterface
      */
-    protected $order;
+    protected $shippable;
 
     /**
      * The shipping extension.
@@ -44,15 +43,24 @@ class GetQuote
     protected $extension;
 
     /**
+     * The parameter array.
+     *
+     * @var array
+     */
+    protected $parameters;
+
+    /**
      * Create a new GetQuote instance.
      *
-     * @param MethodExtension $extension
-     * @param OrderInterface  $order
+     * @param MethodExtension    $extension
+     * @param ShippableInterface $shippable
+     * @param array              $parameters
      */
-    public function __construct(MethodExtension $extension, OrderInterface $order)
+    public function __construct(MethodExtension $extension, ShippableInterface $shippable, array $parameters = [])
     {
-        $this->order     = $order;
-        $this->extension = $extension;
+        $this->shippable  = $shippable;
+        $this->extension  = $extension;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -62,52 +70,34 @@ class GetQuote
      */
     public function handle(ConfigurationRepositoryInterface $configuration)
     {
-        $method = $this->order->getShippingMethod();
+        $origin = $this->shippable->getOrigin();
+        $method = $this->extension->getMethod();
 
         /* @var Rate $rate */
         $rate = $this->dispatch(new GetRate($method));
 
-        $code = $configuration->value('anomaly.extension.ups_shipping_method::service', $method->getSlug());
+        $code = $configuration->value('anomaly.extension.ups_shipping_method::service', $method->getId());
 
         $shipment = new Shipment();
 
-        /**
-         * Set the shipping service.
-         */
-        $service = new Service();
-        $service->setCode($code);
+        $shipment->setService((new Service())->setCode($code));
 
-        $shipment->setService($service);
+        $shipperAddress = $shipment->getShipper()->getAddress();
+        $shipperAddress->setPostalCode('99205');
 
-        /**
-         * Set the shipper's information.
-         */
-        $shipperAddress = $shipment
-            ->getShipper()
-            ->getAddress();
-        $shipperAddress->setPostalCode('61241');
+        $address = new Address();
+        $address->setPostalCode('99205');
 
-        /**
-         * Set the origin information.
-         */
-        $fromAddress = new Address();
-        $fromAddress->setPostalCode('61241');
         $shipFrom = new ShipFrom();
-        $shipFrom->setAddress($fromAddress);
+        $shipFrom->setAddress($address);
 
         $shipment->setShipFrom($shipFrom);
 
-        /**
-         * Set the destination information.
-         */
         $shipTo = $shipment->getShipTo();
         $shipTo->setCompanyName('Test Ship To');
         $shipToAddress = $shipTo->getAddress();
         $shipToAddress->setPostalCode('99205');
 
-        /**
-         * Add a package to the shipment.
-         */
         $package = new Package();
         $package->getPackagingType()->setCode(PackagingType::PT_PACKAGE);
         $package->getPackageWeight()->setWeight(10);
@@ -117,7 +107,7 @@ class GetQuote
         $dimensions->setWidth(10);
         $dimensions->setLength(10);
 
-        $unit = new UnitOfMeasurement();
+        $unit = new UnitOfMeasurement;
         $unit->setCode(UnitOfMeasurement::UOM_IN);
 
         $dimensions->setUnitOfMeasurement($unit);
