@@ -83,35 +83,61 @@ class GetQuote
         $shipment->setService((new Service())->setCode($code));
 
         $shipperAddress = $shipment->getShipper()->getAddress();
-        $shipperAddress->setPostalCode('99205');
+        $shipperAddress->setPostalCode($origin->getPostalCode());
 
         $address = new Address();
-        $address->setPostalCode('99205');
+        $address->setCountryCode($origin->getCountry());
+        $address->setPostalCode($origin->getPostalCode());
+        $address->setAddressLine1($origin->getAddress1());
+        $address->setAddressLine2($origin->getAddress2());
+        $address->setStateProvinceCode($origin->getState());
 
         $shipFrom = new ShipFrom();
         $shipFrom->setAddress($address);
+        $shipFrom->setPhoneNumber($origin->getPhone());
+        $shipFrom->setEmailAddress($origin->getEmail());
+        $shipFrom->setCompanyName($origin->getBusiness());
+        $shipFrom->setAttentionName($origin->getContact());
 
         $shipment->setShipFrom($shipFrom);
 
         $shipTo = $shipment->getShipTo();
-        $shipTo->setCompanyName('Test Ship To');
+        $shipTo->setPhoneNumber(array_get($this->parameters, 'phone'));
+        $shipTo->setEmailAddress(array_get($this->parameters, 'email'));
+        $shipTo->setCompanyName(array_get($this->parameters, 'business'));
+        $shipTo->setAttentionName(array_get($this->parameters, 'contact'));
+
         $shipToAddress = $shipTo->getAddress();
-        $shipToAddress->setPostalCode('99205');
+        $shipToAddress->setCountryCode(array_get($this->parameters, 'country'));
+        $shipToAddress->setAddressLine1(array_get($this->parameters, 'address1'));
+        $shipToAddress->setAddressLine2(array_get($this->parameters, 'address2'));
+        $shipToAddress->setPostalCode(array_get($this->parameters, 'postal_code'));
+        $shipToAddress->setStateProvinceCode(array_get($this->parameters, 'state'));
 
         $package = new Package();
         $package->getPackagingType()->setCode(PackagingType::PT_PACKAGE);
+
+        /**
+         * Default package weight.
+         * This is required.
+         */
         $package->getPackageWeight()->setWeight(10);
 
-        $dimensions = new Dimensions();
-        $dimensions->setHeight(10);
-        $dimensions->setWidth(10);
-        $dimensions->setLength(10);
+        if ($this->shippable->itemHasDimensions()) {
 
-        $unit = new UnitOfMeasurement;
-        $unit->setCode(UnitOfMeasurement::UOM_IN);
+            $dimensions = new Dimensions();
+            $dimensions->setWidth($this->shippable->getItemWidth());
+            $dimensions->setHeight($this->shippable->getItemHeight());
+            $dimensions->setLength($this->shippable->getItemLength());
 
-        $dimensions->setUnitOfMeasurement($unit);
-        $package->setDimensions($dimensions);
+            $unit = new UnitOfMeasurement;
+            $unit->setCode(
+                $this->shippable->getItemUnitSystem() ? UnitOfMeasurement::UOM_IN : UnitOfMeasurement::UOM_CM
+            );
+
+            $dimensions->setUnitOfMeasurement($unit);
+            $package->setDimensions($dimensions);
+        }
 
         $shipment->addPackage($package);
 
