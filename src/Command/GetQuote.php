@@ -3,6 +3,7 @@
 use Anomaly\ConfigurationModule\Configuration\Contract\ConfigurationRepositoryInterface;
 use Anomaly\ShippingModule\Method\Extension\MethodExtension;
 use Anomaly\ShippingModule\Shippable\Contract\ShippableInterface;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Ups\Entity\Address;
 use Ups\Entity\Dimensions;
@@ -67,8 +68,10 @@ class GetQuote
      * Handle the command.
      *
      * @param ConfigurationRepositoryInterface $configuration
+     * @param Repository                       $config
+     * @return float
      */
-    public function handle(ConfigurationRepositoryInterface $configuration)
+    public function handle(ConfigurationRepositoryInterface $configuration, Repository $config)
     {
         $origin = $this->shippable->getOrigin();
         $method = $this->extension->getMethod();
@@ -123,6 +126,15 @@ class GetQuote
          */
         $package->getPackageWeight()->setWeight(10);
 
+        $unit = new UnitOfMeasurement;
+        $unit->setCode(
+            $config->get(
+                'streams::system.unit_system'
+            ) == 'imperial' ? UnitOfMeasurement::UOM_LBS : UnitOfMeasurement::UOM_KGS
+        );
+
+        $package->getPackageWeight()->setUnitOfMeasurement($unit);
+
         if ($this->shippable->itemHasDimensions()) {
 
             $dimensions = new Dimensions();
@@ -132,7 +144,9 @@ class GetQuote
 
             $unit = new UnitOfMeasurement;
             $unit->setCode(
-                $this->shippable->getItemUnitSystem() ? UnitOfMeasurement::UOM_IN : UnitOfMeasurement::UOM_CM
+                $config->get(
+                    'streams::system.unit_system'
+                ) == 'imperial' ? UnitOfMeasurement::UOM_IN : UnitOfMeasurement::UOM_CM
             );
 
             $dimensions->setUnitOfMeasurement($unit);
