@@ -1,7 +1,7 @@
 <?php namespace Anomaly\UpsShippingMethodExtension;
 
 use Anomaly\ShippingModule\Method\Extension\MethodExtension;
-use Anomaly\ShippingModule\Shippable\Contract\ShippableInterface;
+use Anomaly\StoreModule\Contract\ShippableInterface;
 use Anomaly\UpsShippingMethodExtension\Command\GetQuote;
 
 /**
