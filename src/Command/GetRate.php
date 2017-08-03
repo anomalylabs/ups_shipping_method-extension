@@ -8,27 +8,12 @@ use Ups\Rate;
 /**
  * Class GetRate
  *
- * @link          http://pyrocms.com/
- * @author        PyroCMS, Inc. <support@pyrocms.com>
- * @author        Ryan Thompson <ryan@pyrocms.com>
- * @package       Anomaly\UpsShippingMethodExtension\Command
+ * @link   http://pyrocms.com/
+ * @author PyroCMS, Inc. <support@pyrocms.com>
+ * @author Ryan Thompson <ryan@pyrocms.com>
  */
 class GetRate
 {
-
-    /**
-     * The method interface.
-     *
-     * @var MethodInterface
-     */
-    protected $method;
-
-    /**
-     * The method extension.
-     *
-     * @var MethodExtension
-     */
-    protected $extension;
 
     /**
      * Handle the command.

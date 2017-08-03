@@ -77,7 +77,7 @@ class GetQuote
         $method = $this->extension->getMethod();
 
         /* @var Rate $rate */
-        $rate = $this->dispatch(new GetRate($method));
+        $rate = $this->dispatch(new GetRate());
 
         $code = $configuration->value('anomaly.extension.ups_shipping_method::service', $method->getId());
 
