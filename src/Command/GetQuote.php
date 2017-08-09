@@ -124,7 +124,7 @@ class GetQuote
          * Default package weight.
          * This is required.
          */
-        $package->getPackageWeight()->setWeight($this->shippable->getShippableWeight());
+        $package->getPackageWeight()->setWeight($this->shippable->getShippableWeight() ?: 1);
 
         $unit = new UnitOfMeasurement;
         $unit->setCode(
